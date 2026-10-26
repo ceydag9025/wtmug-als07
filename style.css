@@ -1,50 +1,28 @@
-/* FORCED LIGHT MODE ENFORCEMENT OVERRIDES */
 :root, html, body {
   color-scheme: light !important;
   forced-color-adjust: none !important;
   -webkit-forced-color-adjust: none !important;
 }
 
-/* Prevent touch zoom and double tap zoom for true native PWA feel */
+/* Mobil dokunma optimizasyonu - Tıklama ve dokunmaların engellenmemesini sağlar */
 html, body {
-  touch-action: manipulation;
-  user-select: none;
+  touch-action: pan-x pan-y;
   -webkit-user-select: none;
+  user-select: none;
   -webkit-tap-highlight-color: transparent;
   background-color: #f1f5f9 !important;
   color: #0f172a !important;
 }
 
-/* Ensure SVG plates always remain strictly untouched by browser dark mode extensions */
-.ishihara-container, #ishiharaSvg, svg circle {
-  forced-color-adjust: none !important;
-  -webkit-forced-color-adjust: none !important;
-  color-scheme: light !important;
+svg {
+  touch-action: none;
 }
 
-/* Chrome/Safari Dark mode forced inversion protection */
-@media (prefers-color-scheme: dark) {
-  html, body, .ishihara-container, svg {
-    filter: none !important;
-    background-color: #f1f5f9 !important;
-    color: #0f172a !important;
-  }
-}
-
-/* Fade In Animation */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(6px); }
+  from { opacity: 0; transform: translateY(4px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.25s ease-out forwards;
-}
-
-/* SVG circle smooth click hover effect */
-#ishiharaSvg circle {
-  transition: opacity 0.15s ease;
-}
-#ishiharaSvg circle:hover {
-  opacity: 0.9;
+  animation: fadeIn 0.2s ease-out forwards;
 }

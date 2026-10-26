@@ -1,8 +1,3 @@
-/**
- * RENK KÖRLÜĞÜ TESTİ - PWA JS ENGINE
- */
-
-// Global State
 let currentStep = 0;
 const TOTAL_STEPS = 10;
 let testQuestions = [];
@@ -10,48 +5,41 @@ let userAnswers = [];
 let targetShapeCircles = [];
 let deferredPrompt = null;
 
-// Color Palette Generators for Dynamic Ishihara Plates
 const COLOR_PALETTES = {
-  // Protanopia / Deuteranopia (Red-Green)
   RED_GREEN: {
     bg: ['#8A9A5B', '#99B898', '#A8E6CF', '#556B2F', '#6E8B3D', '#778899'],
     fg: ['#E84A5F', '#FF847C', '#FECEAB', '#D9534F', '#C0392B', '#E74C3C']
   },
-  // Tritanopia (Blue-Yellow)
   BLUE_YELLOW: {
     bg: ['#5D9CEC', '#4A89DC', '#4FC1E9', '#3BAFDA', '#00A86B', '#2ECC71'],
     fg: ['#F6BB42', '#E6C875', '#FFCE54', '#FC6E51', '#E9573F', '#DA4453']
   },
-  // Achromatopsia / Monochromacy (Total Color Blindness Vector)
   TOTAL: {
     bg: ['#7f8c8d', '#95a5a6', '#bdc3c7', '#6c7a89', '#abb7b7'],
     fg: ['#2c3e50', '#34495e', '#1a252f', '#415b76', '#52637a']
   }
 };
 
-// Initialize Lucide Icons
 document.addEventListener('DOMContentLoaded', () => {
   if (window.lucide) lucide.createIcons();
   initPWA();
   bindEvents();
 });
 
-// Bind UI Events
 function bindEvents() {
   document.getElementById('startBtn').addEventListener('click', startTest);
-  document.getElementById('submitNumberBtn').addEventListener('click', submitNumberAnswer);
+  document.getElementById('submitNumberBtn').addEventListener('click', () => submitNumberAnswer());
   document.getElementById('cantSeeBtn').addEventListener('click', () => submitNumberAnswer(true));
   document.getElementById('restartBtn').addEventListener('click', startTest);
 
-  // Keyboard Enter listener
   document.getElementById('numberInput').addEventListener('keypress', (e) => {
     if (e.key === 'Enter') submitNumberAnswer();
   });
 
-  // SVG Click/Tap event for shape detection
-  document.getElementById('ishiharaSvg').addEventListener('click', handleSvgClick);
+  // Hem mouse click hem de mobil dokunma (pointerdown / click) desteği
+  const svgEl = document.getElementById('ishiharaSvg');
+  svgEl.addEventListener('pointerdown', handleSvgInteraction);
 
-  // Dev Tools Modal
   document.getElementById('devToolsToggle').addEventListener('click', () => {
     document.getElementById('devModal').classList.remove('hidden');
   });
@@ -59,46 +47,30 @@ function bindEvents() {
     document.getElementById('devModal').classList.add('hidden');
   });
 
-  // Dev Files Downloaders
   document.getElementById('downloadManifestBtn').addEventListener('click', downloadManifest);
   document.getElementById('downloadSwBtn').addEventListener('click', downloadSw);
   document.getElementById('downloadNoJekyllBtn').addEventListener('click', downloadNoJekyll);
 }
 
-// Generate 10-step Dynamic Test Plan
 function generateTestPlan() {
   const plan = [];
   const paletteKeys = ['RED_GREEN', 'RED_GREEN', 'BLUE_YELLOW', 'BLUE_YELLOW', 'TOTAL'];
   
-  // 5 Number Recognition Steps (1-99)
   for (let i = 0; i < 5; i++) {
     const randomNum = Math.floor(Math.random() * 99) + 1;
     const paletteKey = paletteKeys[i % paletteKeys.length];
-    plan.push({
-      type: 'NUMBER',
-      targetValue: randomNum,
-      paletteKey: paletteKey,
-      palette: COLOR_PALETTES[paletteKey]
-    });
+    plan.push({ type: 'NUMBER', targetValue: randomNum, paletteKey, palette: COLOR_PALETTES[paletteKey] });
   }
 
-  // 5 Shape / Tap Steps
   const shapeTypes = ['circle', 'ring', 'triangle', 'square', 'star'];
   for (let i = 0; i < 5; i++) {
     const paletteKey = paletteKeys[(i + 2) % paletteKeys.length];
-    plan.push({
-      type: 'TAP',
-      shape: shapeTypes[i % shapeTypes.length],
-      paletteKey: paletteKey,
-      palette: COLOR_PALETTES[paletteKey]
-    });
+    plan.push({ type: 'TAP', shape: shapeTypes[i % shapeTypes.length], paletteKey, palette: COLOR_PALETTES[paletteKey] });
   }
 
-  // Shuffle array randomly
   return plan.sort(() => Math.random() - 0.5);
 }
 
-// Start Test
 function startTest() {
   currentStep = 0;
   userAnswers = [];
@@ -111,11 +83,9 @@ function startTest() {
   renderStep();
 }
 
-// Render Current Step
 function renderStep() {
   const q = testQuestions[currentStep];
   
-  // Update Badges & Progress
   document.getElementById('stepBadge').innerText = `Aşama ${currentStep + 1} / ${TOTAL_STEPS}`;
   document.getElementById('progressBar').style.width = `${((currentStep + 1) / TOTAL_STEPS) * 100}%`;
   
@@ -124,10 +94,8 @@ function renderStep() {
   if (q.paletteKey === 'TOTAL') typeLabel = 'Tam Körlük';
   document.getElementById('testTypeBadge').innerText = typeLabel;
 
-  // Render SVG Plate
   renderIshiharaPlate(q);
 
-  // Toggle Input Controls
   const numberArea = document.getElementById('numberInputArea');
   const tapArea = document.getElementById('tapInstructionArea');
   const numberInput = document.getElementById('numberInput');
@@ -146,22 +114,17 @@ function renderStep() {
   }
 }
 
-// Render Ishihara SVG Plate using Dynamic Dot Circle Packing Algorithm
 function renderIshiharaPlate(question) {
   const svg = document.getElementById('ishiharaSvg');
   svg.innerHTML = '';
   targetShapeCircles = [];
 
-  const width = 400;
-  const height = 400;
   const center = { x: 200, y: 200 };
   const radius = 180;
-
   const dots = [];
-  const maxDots = 650;
+  const maxDots = 600;
   let attempts = 0;
 
-  // Background base circle
   const baseBg = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
   baseBg.setAttribute('cx', '200');
   baseBg.setAttribute('cy', '200');
@@ -169,36 +132,32 @@ function renderIshiharaPlate(question) {
   baseBg.setAttribute('fill', '#f8fafc');
   svg.appendChild(baseBg);
 
-  while (dots.length < maxDots && attempts < 3500) {
+  while (dots.length < maxDots && attempts < 3000) {
     attempts++;
-    const r = Math.random() * (11 - 4) + 4; // dot radius range
+    const r = Math.random() * (10 - 4) + 4;
     const angle = Math.random() * Math.PI * 2;
     const dist = Math.sqrt(Math.random()) * (radius - r);
     
     const x = center.x + dist * Math.cos(angle);
     const y = center.y + dist * Math.sin(angle);
 
-    // Collision check
     let collision = false;
     for (const d of dots) {
       const dx = x - d.x;
       const dy = y - d.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-      if (distance < (r + d.r + 2)) {
+      if (Math.sqrt(dx * dx + dy * dy) < (r + d.r + 2)) {
         collision = true;
         break;
       }
     }
 
     if (!collision) {
-      // Determine if point falls inside foreground shape/number pattern
       const isTarget = isPointInPattern(x, y, question);
       dots.push({ x, y, r, isTarget });
     }
   }
 
-  // Draw Dots into SVG
-  dots.forEach((d, idx) => {
+  dots.forEach((d) => {
     const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     circle.setAttribute('cx', d.x);
     circle.setAttribute('cy', d.y);
@@ -209,8 +168,6 @@ function renderIshiharaPlate(question) {
     const color = colorList[Math.floor(Math.random() * colorList.length)];
 
     circle.setAttribute('fill', color);
-    circle.setAttribute('data-target', d.isTarget);
-    circle.setAttribute('data-id', idx);
 
     if (d.isTarget) {
       targetShapeCircles.push({ x: d.x, y: d.y, r: d.r });
@@ -220,7 +177,6 @@ function renderIshiharaPlate(question) {
   });
 }
 
-// Geometric & Text Pattern Detection
 function isPointInPattern(x, y, question) {
   if (question.type === 'NUMBER') {
     return isPointInNumber(x, y, question.targetValue);
@@ -229,7 +185,6 @@ function isPointInPattern(x, y, question) {
   }
 }
 
-// Canvas-based precise number dot masking
 function isPointInNumber(x, y, number) {
   const canvas = document.createElement('canvas');
   canvas.width = 400;
@@ -246,29 +201,21 @@ function isPointInNumber(x, y, number) {
   return pixel[3] > 128;
 }
 
-// Geometric shape masking for tap steps
 function isPointInShape(x, y, shape) {
   const dx = x - 200;
   const dy = y - 200;
   const dist = Math.sqrt(dx * dx + dy * dy);
 
   switch (shape) {
-    case 'circle':
-      return dist < 70;
-    case 'ring':
-      return dist > 45 && dist < 85;
-    case 'square':
-      return Math.abs(dx) < 60 && Math.abs(dy) < 60;
-    case 'triangle':
-      return dy > -60 && dy < 60 && Math.abs(dx) < (60 - dy / 2);
-    case 'star':
-      return dist < 70 && (Math.atan2(dy, dx) % (Math.PI / 2.5) > 0);
-    default:
-      return dist < 60;
+    case 'circle': return dist < 70;
+    case 'ring': return dist > 45 && dist < 85;
+    case 'square': return Math.abs(dx) < 60 && Math.abs(dy) < 60;
+    case 'triangle': return dy > -60 && dy < 60 && Math.abs(dx) < (60 - dy / 2);
+    case 'star': return dist < 70;
+    default: return dist < 60;
   }
 }
 
-// Submit Answer for Number Type
 function submitNumberAnswer(passedCantSee = false) {
   const q = testQuestions[currentStep];
   if (q.type !== 'NUMBER') return;
@@ -283,8 +230,7 @@ function submitNumberAnswer(passedCantSee = false) {
   recordAnswer(isCorrect, passedCantSee ? 'Göremedi' : (inputVal || 'Boş'));
 }
 
-// Handle SVG Tap Click
-function handleSvgClick(e) {
+function handleSvgInteraction(e) {
   const q = testQuestions[currentStep];
   if (q.type !== 'TAP') return;
 
@@ -293,22 +239,20 @@ function handleSvgClick(e) {
   const tapX = (e.clientX - rect.left) * scale;
   const tapY = (e.clientY - rect.top) * scale;
 
-  // Check if tap hit target zone
   let hit = false;
   for (const circle of targetShapeCircles) {
     const dx = tapX - circle.x;
     const dy = tapY - circle.y;
-    if (Math.sqrt(dx * dx + dy * dy) <= circle.r + 15) {
+    if (Math.sqrt(dx * dx + dy * dy) <= circle.r + 20) {
       hit = true;
       break;
     }
   }
 
   showFeedback(hit);
-  recordAnswer(hit, hit ? 'Doğru Bölgeye Dokundu' : 'Yanlış Bölgeye Dokundu');
+  recordAnswer(hit, hit ? 'Doğru Bölge' : 'Yanlış Bölge');
 }
 
-// Visual Feedback animation overlay
 function showFeedback(isSuccess) {
   const overlay = document.getElementById('feedbackOverlay');
   overlay.innerText = isSuccess ? '✓ Algılandı' : '✕ Farklı Bölge';
@@ -320,20 +264,18 @@ function showFeedback(isSuccess) {
   }, 400);
 }
 
-// Record step answer and advance flow
 function recordAnswer(isCorrect, userVal) {
   const q = testQuestions[currentStep];
   userAnswers.push({
     step: currentStep + 1,
     type: q.type,
     paletteKey: q.paletteKey,
-    isCorrect: isCorrect,
-    userVal: userVal,
+    isCorrect,
+    userVal,
     targetVal: q.type === 'NUMBER' ? q.targetValue : q.shape
   });
 
   currentStep++;
-
   if (currentStep < TOTAL_STEPS) {
     renderStep();
   } else {
@@ -341,7 +283,6 @@ function recordAnswer(isCorrect, userVal) {
   }
 }
 
-// Calculate Diagnosis and Display Results
 function finishTest() {
   document.getElementById('testScreen').classList.add('hidden');
   document.getElementById('resultScreen').classList.remove('hidden');
@@ -365,7 +306,6 @@ function finishTest() {
   const totalRisk = Math.round((totalErrors / TOTAL_STEPS) * 100);
   const normalScore = Math.max(0, 100 - totalRisk);
 
-  // Update Progress Bars & Percentages
   document.getElementById('normalScore').innerText = `%${normalScore}`;
   document.getElementById('normalBar').style.width = `${normalScore}%`;
 
@@ -378,7 +318,6 @@ function finishTest() {
   document.getElementById('totalScore').innerText = `%${totalRisk}`;
   document.getElementById('totalBar').style.width = `${totalRisk}%`;
 
-  // Diagnosis Title logic
   const titleEl = document.getElementById('diagnosisTitle');
   const subEl = document.getElementById('diagnosisSubtitle');
 
@@ -386,120 +325,61 @@ function finishTest() {
     titleEl.innerText = 'Normal Renk Algısı';
     titleEl.className = 'text-2xl font-bold text-emerald-600';
     subEl.innerText = 'Test aşamalarının tamamı başarıyla geçildi.';
-  } else if (rgRisk >= 50 && rgRisk >= byRisk) {
-    titleEl.innerText = 'Şüpheli Kırmızı-Yeşil Körlüğü (Protan / Deutan)';
+  } else if (rgRisk >= 50) {
+    titleEl.innerText = 'Şüpheli Kırmızı-Yeşil Körlüğü (Protan/Deutan)';
     titleEl.className = 'text-2xl font-bold text-rose-600';
-    subEl.innerText = 'Kırmızı ve yeşil renk tonları aşamalarında belirgin hata tespit edildi.';
-  } else if (byRisk >= 50) {
-    titleEl.innerText = 'Şüpheli Mavi-Sarı Körlüğü (Tritanopia)';
-    titleEl.className = 'text-2xl font-bold text-amber-600';
-    subEl.innerText = 'Mavi ve sarı spektrumundaki aşamalarda sapma tespit edildi.';
+    subEl.innerText = 'Kırmızı ve yeşil renk tonlarında hata tespit edildi.';
   } else {
-    titleEl.innerText = 'Kısmi Renk Görme Hassasiyeti / Karma Sapma';
-    titleEl.className = 'text-2xl font-bold text-purple-600';
-    subEl.innerText = 'Farklı renk paletlerinde kısmi hata oranları saptandı.';
+    titleEl.innerText = 'Şüpheli Mavi-Sarı Körlüğü (Tritan)';
+    titleEl.className = 'text-2xl font-bold text-amber-600';
+    subEl.innerText = 'Mavi ve sarı spektrumunda sapma tespit edildi.';
   }
 
-  // Populate Detailed Breakdown List
   const breakdownList = document.getElementById('breakdownList');
   breakdownList.innerHTML = '';
   userAnswers.forEach(ans => {
     const item = document.createElement('div');
-    item.className = `p-2 rounded-lg border flex justify-between items-center ${ans.isCorrect ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-rose-50 border-rose-200 text-rose-900'}`;
-    item.innerHTML = `
-      <span><b>Aşama ${ans.step}:</b> ${ans.type === 'NUMBER' ? 'Sayı Tanıma' : 'Şekil Dokunma'} (${ans.paletteKey})</span>
-      <span class="font-bold">${ans.isCorrect ? '✓ Doğru' : '✕ Yanlış (' + ans.userVal + ')'}</span>
-    `;
+    item.className = `p-2 rounded-lg border flex justify-between items-center text-xs ${ans.isCorrect ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-rose-50 border-rose-200 text-rose-900'}`;
+    item.innerHTML = `<span><b>Aşama ${ans.step}:</b> ${ans.type === 'NUMBER' ? 'Sayı' : 'Şekil'}</span><span class="font-bold">${ans.isCorrect ? '✓' : '✕'}</span>`;
     breakdownList.appendChild(item);
   });
 }
 
-// PWA Service Worker Registration & Install Banner
 function initPWA() {
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js')
-      .then(() => console.log('Service Worker Registered'))
-      .catch(err => console.log('SW Reg Error:', err));
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
   }
-
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
     document.getElementById('installContainer').classList.remove('hidden');
   });
-
   document.getElementById('installBtn').addEventListener('click', async () => {
     if (deferredPrompt) {
       deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      if (outcome === 'accepted') {
-        document.getElementById('installContainer').classList.add('hidden');
-      }
       deferredPrompt = null;
     }
   });
 }
 
-// Dev File Download Helpers
 function downloadFile(content, fileName, mimeType) {
   const blob = new Blob([content], { type: mimeType });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = fileName;
   a.click();
-  URL.revokeObjectURL(a.href);
 }
 
 function downloadManifest() {
-  const manifest = {
-    "name": "Renk Körlüğü Testi",
-    "short_name": "Renk Testi",
-    "start_url": "./index.html",
-    "display": "standalone",
-    "background_color": "#ffffff",
-    "theme_color": "#2563eb",
-    "icons": [
-      {
-        "src": "icons/icon-192.png",
-        "sizes": "192x192",
-        "type": "image/png"
-      },
-      {
-        "src": "icons/icon-512.png",
-        "sizes": "512x512",
-        "type": "image/png"
-      }
-    ]
-  };
-  downloadFile(JSON.stringify(manifest, null, 2), 'manifest.json', 'application/json');
+  downloadFile(JSON.stringify({
+    "name": "Renk Körlüğü Testi", "short_name": "Renk Testi", "start_url": "./index.html",
+    "display": "standalone", "background_color": "#ffffff", "theme_color": "#2563eb",
+    "icons": [{"src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png"}]
+  }, null, 2), 'manifest.json', 'application/json');
 }
 
 function downloadSw() {
-  const swContent = `
-const CACHE_NAME = 'renk-testi-v1';
-const ASSETS = [
-  './',
-  './index.html',
-  './style.css',
-  './app.js',
-  './manifest.json',
-  'https://cdn.tailwindcss.com',
-  'https://unpkg.com/lucide@latest'
-];
-
-self.addEventListener('install', (e) => {
-  e.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
-  );
-});
-
-self.addEventListener('fetch', (e) => {
-  e.respondWith(
-    caches.match(e.request).then((res) => res || fetch(e.request))
-  );
-});
-  `.trim();
-  downloadFile(swContent, 'sw.js', 'application/javascript');
+  downloadFile("self.addEventListener('fetch', e => e.respondWith(fetch(e.request).catch(() => caches.match(e.request))));", 'sw.js', 'application/javascript');
 }
 
 function downloadNoJekyll() {

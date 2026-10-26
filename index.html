@@ -2,14 +2,12 @@
 <html lang="tr" class="light" style="color-scheme: light !important;">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="color-scheme" content="light">
   <meta name="theme-color" content="#2563eb">
-  <meta name="description" content="Rastgele SVG Ishihara plakaları ile interaktif klinik renk körlüğü testi PWA.">
   <title>Renk Körlüğü Testi</title>
   
   <link rel="manifest" href="manifest.json">
-  <link rel="apple-touch-icon" href="icons/icon-192.png">
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -18,23 +16,23 @@
   
   <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-slate-100 text-slate-800 antialiased font-sans min-h-screen flex flex-col justify-between selection:bg-blue-200">
+<body class="bg-slate-100 text-slate-800 antialiased font-sans min-h-screen flex flex-col justify-between select-none">
 
   <!-- Header -->
   <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
     <div class="max-w-xl mx-auto px-4 py-3 flex items-center justify-between">
       <div class="flex items-center gap-2">
-        <div class="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold text-xl shadow-md shadow-blue-500/20">
+        <div class="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold text-xl shadow-md">
           <i data-lucide="eye" class="w-5 h-5"></i>
         </div>
         <div>
           <h1 class="font-bold text-slate-900 leading-tight">Renk Körlüğü Testi</h1>
-          <p class="text-xs text-slate-500">Dinamik Klinik Ishihara PWA</p>
+          <p class="text-xs text-slate-500">Dinamik Klinik PWA</p>
         </div>
       </div>
       
       <div id="installContainer" class="hidden">
-        <button id="installBtn" class="flex items-center gap-1.5 text-xs font-semibold bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg border border-blue-200 transition-all">
+        <button id="installBtn" class="flex items-center gap-1.5 text-xs font-semibold bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg border border-blue-200">
           <i data-lucide="download" class="w-4 h-4"></i> Yükle
         </button>
       </div>
@@ -45,54 +43,33 @@
   <main class="max-w-xl w-full mx-auto p-4 flex-1 flex flex-col justify-center">
 
     <!-- SCREEN 1: START SCREEN -->
-    <section id="startScreen" class="bg-white rounded-2xl p-6 shadow-xl border border-slate-200 text-center space-y-5 animate-fade-in">
+    <section id="startScreen" class="bg-white rounded-2xl p-6 shadow-xl border border-slate-200 text-center space-y-5">
       <div class="w-20 h-20 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto ring-8 ring-blue-50/50">
         <i data-lucide="shield-check" class="w-10 h-10"></i>
       </div>
       
       <div>
         <h2 class="text-2xl font-bold text-slate-900">Klinik Renk Görme Testi</h2>
-        <p class="text-sm text-slate-600 mt-1">10 aşamalı rastgele SVG plakaları ile kişiselleştirilmiş renk algısı analizi.</p>
+        <p class="text-sm text-slate-600 mt-1">10 aşamalı rastgele SVG plakaları ile renk algısı analizi.</p>
       </div>
 
-      <!-- FORCE DARK MODE WARNING CARD -->
-      <div class="bg-amber-50 border border-amber-200 rounded-xl p-3.5 text-left text-xs text-amber-900 flex items-start gap-2.5 shadow-sm">
+      <div class="bg-amber-50 border border-amber-200 rounded-xl p-3.5 text-left text-xs text-amber-900 flex items-start gap-2.5">
         <i data-lucide="sun-medium" class="w-5 h-5 text-amber-600 shrink-0 mt-0.5"></i>
         <div>
-          <strong class="font-semibold block mb-0.5 text-amber-950">Önemli Renk Kalibrasyonu Uyarısı:</strong>
-          Testin doğruluğu için tarayıcınızın <i>"Zorunlu Karanlık Mod" (Force Dark Mode)</i> veya ekranınızın <i>"Gece Işığı / Mavi Işık Filtresi"</i> özelliğinin kapalı olduğundan emin olunuz.
+          <strong class="font-semibold block mb-0.5 text-amber-950">Renk Kalibrasyonu Uyarısı:</strong>
+          Testin doğruluğu için telefonunuzun <i>Gece Işığı / Mavi Işık Filtresi</i> veya <i>Koyu Mod</i> ayarının kapalı olduğundan emin olun.
         </div>
       </div>
 
-      <div class="grid grid-cols-2 gap-3 text-left text-xs text-slate-600 bg-slate-50 p-4 rounded-xl border border-slate-200">
-        <div class="flex items-center gap-2">
-          <i data-lucide="hash" class="w-4 h-4 text-blue-500 shrink-0"></i>
-          <span><b>5 Aşama:</b> Sayı Tanıma (1-99)</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <i data-lucide="touch-portal" class="w-4 h-4 text-emerald-500 shrink-0"></i>
-          <span><b>5 Aşama:</b> Şekil/Alan Dokunma</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <i data-lucide="sparkles" class="w-4 h-4 text-amber-500 shrink-0"></i>
-          <span>Dinamik SVG Üretimi</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <i data-lucide="wifi-off" class="w-4 h-4 text-indigo-500 shrink-0"></i>
-          <span>Tam Çevrimdışı (PWA)</span>
-        </div>
-      </div>
-
-      <button id="startBtn" class="w-full py-3.5 bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white font-semibold rounded-xl shadow-lg shadow-blue-500/25 transition-all flex items-center justify-center gap-2 text-base">
+      <button id="startBtn" class="w-full py-4 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/25 transition-all flex items-center justify-center gap-2 text-base cursor-pointer">
         <span>Testi Başlat</span>
         <i data-lucide="arrow-right" class="w-5 h-5"></i>
       </button>
     </section>
 
     <!-- SCREEN 2: TEST SCREEN -->
-    <section id="testScreen" class="hidden flex-col items-center space-y-4 animate-fade-in">
+    <section id="testScreen" class="hidden flex-col items-center space-y-4">
       
-      <!-- Progress Bar & Header Info -->
       <div class="w-full bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
         <div class="flex items-center gap-2">
           <span id="stepBadge" class="bg-blue-100 text-blue-800 text-xs font-bold px-2.5 py-1 rounded-lg">Aşama 1 / 10</span>
@@ -103,16 +80,15 @@
         </div>
       </div>
 
-      <!-- Instructions Banner -->
       <div class="w-full text-center">
-        <p id="instructionText" class="text-sm font-semibold text-slate-700 bg-white px-4 py-2 rounded-xl border border-slate-200 shadow-sm">
+        <p id="instructionText" class="text-sm font-semibold text-slate-700 bg-white px-4 py-2.5 rounded-xl border border-slate-200 shadow-sm">
           Görseldeki sayıyı aşağıdaki kutuya yazın:
         </p>
       </div>
 
-      <!-- SVG ISHIHARA PLATE CONTAINER -->
-      <div class="ishihara-container relative w-full aspect-square max-w-[340px] max-h-[340px] bg-slate-50 rounded-full p-2 border-4 border-white shadow-xl flex items-center justify-center select-none overflow-hidden">
-        <svg id="ishiharaSvg" viewBox="0 0 400 400" class="w-full h-full cursor-pointer touch-none rounded-full"></svg>
+      <!-- SVG ISHIHARA PLATE CONTAINER - TOUCH OPTIMIZED -->
+      <div class="relative w-full aspect-square max-w-[340px] bg-slate-50 rounded-full p-2 border-4 border-white shadow-xl flex items-center justify-center overflow-hidden">
+        <svg id="ishiharaSvg" viewBox="0 0 400 400" class="w-full h-full rounded-full touch-auto cursor-pointer"></svg>
         <div id="feedbackOverlay" class="absolute inset-0 rounded-full flex items-center justify-center bg-black/40 text-white font-bold text-lg opacity-0 pointer-events-none transition-opacity duration-200"></div>
       </div>
 
@@ -120,33 +96,32 @@
       <div id="numberInputArea" class="w-full max-w-[340px] space-y-3">
         <div class="flex gap-2">
           <input type="number" id="numberInput" min="1" max="99" placeholder="Örn: 42" autocomplete="off" class="flex-1 bg-white border border-slate-300 text-slate-900 text-center font-bold text-xl rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-inner">
-          <button id="submitNumberBtn" class="bg-blue-600 text-white font-semibold px-6 py-3 rounded-xl shadow-md hover:bg-blue-700 active:scale-95 transition-all flex items-center gap-1">
+          <button id="submitNumberBtn" class="bg-blue-600 text-white font-semibold px-6 py-3 rounded-xl shadow-md hover:bg-blue-700 active:scale-95 transition-all flex items-center gap-1 cursor-pointer">
             <span>Onayla</span>
             <i data-lucide="check" class="w-5 h-5"></i>
           </button>
         </div>
-        <button id="cantSeeBtn" class="w-full py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-semibold rounded-xl transition-all">
-          Hiçbir Şey Göremiyorum / Göremedim
+        <button id="cantSeeBtn" class="w-full py-3 bg-slate-200 hover:bg-slate-300 active:scale-95 text-slate-700 text-xs font-semibold rounded-xl transition-all cursor-pointer">
+          Hiçbir Şey Göremiyorum / Okuyamıyorum
         </button>
       </div>
 
       <!-- INSTRUCTION FOR TAP TYPE -->
       <div id="tapInstructionArea" class="hidden text-center w-full max-w-[340px]">
-        <p class="text-xs text-slate-500 bg-amber-50 text-amber-800 p-2.5 rounded-xl border border-amber-200">
-          💡 Plaka üzerinde renk veya ton farkı olan gizli bölgeye doğrudan parmağınızla dokunun.
+        <p class="text-xs text-slate-600 bg-amber-50 text-amber-900 p-3 rounded-xl border border-amber-200 font-medium">
+          👆 Lütfen plaka üzerinde farklı renkteki gizli şekle veya alana parmağınızla dokunun.
         </p>
       </div>
     </section>
 
     <!-- SCREEN 3: RESULT SCREEN -->
-    <section id="resultScreen" class="hidden bg-white rounded-2xl p-6 shadow-xl border border-slate-200 space-y-5 animate-fade-in">
+    <section id="resultScreen" class="hidden bg-white rounded-2xl p-6 shadow-xl border border-slate-200 space-y-5">
       <div class="text-center space-y-1">
         <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Klinik Değerlendirme Raporu</span>
         <h2 id="diagnosisTitle" class="text-2xl font-bold text-slate-900">Normal Görüş</h2>
-        <p id="diagnosisSubtitle" class="text-xs text-slate-600">Test verilerinize dayanan renk algısı risk matrisi.</p>
+        <p id="diagnosisSubtitle" class="text-xs text-slate-600">Test verilerinize dayanan renk algısı risk analizi.</p>
       </div>
 
-      <!-- RISK METRICS BARS -->
       <div class="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-200">
         <div>
           <div class="flex justify-between text-xs font-medium mb-1">
@@ -189,69 +164,35 @@
         </div>
       </div>
 
-      <!-- Detailed Breakdown Log -->
       <div class="space-y-2">
         <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Aşama Detayları</h3>
         <div id="breakdownList" class="max-h-36 overflow-y-auto space-y-1.5 pr-1 text-xs"></div>
       </div>
 
-      <div class="bg-blue-50 border border-blue-200 p-3 rounded-xl text-xs text-blue-900">
-        <p><b>⚠️ Sorumluluk Reddi:</b> Bu test yalnızca bir ön tarama aracıdır. Kesin teşhis ve sağlık kontrolleri için lütfen bir göz hastalıkları uzmanına başvurunuz.</p>
-      </div>
-
-      <div class="flex gap-2">
-        <button id="restartBtn" class="flex-1 py-3 bg-blue-600 text-white font-semibold rounded-xl shadow-md hover:bg-blue-700 active:scale-95 transition-all flex items-center justify-center gap-1.5 text-sm">
-          <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Testi Tekrarla
-        </button>
-      </div>
+      <button id="restartBtn" class="w-full py-3.5 bg-blue-600 text-white font-semibold rounded-xl shadow-md hover:bg-blue-700 active:scale-95 transition-all flex items-center justify-center gap-1.5 text-sm cursor-pointer">
+        <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Testi Tekrarla
+      </button>
     </section>
 
   </main>
 
-  <!-- Footer & Developer Tools -->
   <footer class="bg-white border-t border-slate-200 py-3 text-center text-xs text-slate-500">
     <div class="max-w-xl mx-auto px-4 flex justify-between items-center">
       <span>Ishihara SVG Engine PWA</span>
-      <button id="devToolsToggle" class="text-slate-400 hover:text-slate-600 underline text-[11px]">GitHub / PWA Dosyaları</button>
+      <button id="devToolsToggle" class="text-slate-400 hover:text-slate-600 underline text-[11px] cursor-pointer">PWA Dosyaları</button>
     </div>
   </footer>
 
-  <!-- DEV TOOLS MODAL -->
   <div id="devModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-lg w-full p-5 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-5 space-y-4 shadow-2xl">
       <div class="flex justify-between items-center border-b border-slate-200 pb-3">
-        <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
-          <i data-lucide="folder-git2" class="w-4 h-4 text-blue-600"></i>
-          PWA & GitHub Pages Dağıtım Dosyaları
-        </h3>
-        <button id="closeDevModal" class="text-slate-400 hover:text-slate-600 p-1">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
+        <h3 class="font-bold text-slate-900 text-sm">PWA Yardımcı Dosyaları</h3>
+        <button id="closeDevModal" class="text-slate-400 hover:text-slate-600 p-1 cursor-pointer"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
-      
-      <p class="text-xs text-slate-600">
-        Uygulamayı GitHub Pages üzerinde <code>https://kullaniciAdiniz.github.io/wtmug-als07</code> şeklinde yayınlamak için projenizin kök dizinine koymanız gereken yardımcı dosyaları buradan yükleyebilirsiniz:
-      </p>
-
       <div class="space-y-2">
-        <button id="downloadManifestBtn" class="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 border border-slate-300">
-          <i data-lucide="file-json" class="w-4 h-4 text-blue-600"></i> manifest.json İndir
-        </button>
-        <button id="downloadSwBtn" class="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 border border-slate-300">
-          <i data-lucide="code" class="w-4 h-4 text-emerald-600"></i> sw.js (Service Worker) İndir
-        </button>
-        <button id="downloadNoJekyllBtn" class="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 border border-slate-300">
-          <i data-lucide="file-code" class="w-4 h-4 text-purple-600"></i> .nojekyll İndir
-        </button>
-      </div>
-
-      <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-[11px] text-slate-600 space-y-1">
-        <strong class="text-slate-800 block">GitHub Pages Kurulum Adımları:</strong>
-        <ol class="list-decimal list-inside space-y-1">
-          <li>GitHub'da <code>wtmug-als07</code> adında yeni bir repository açın.</li>
-          <li><code>index.html</code>, <code>style.css</code>, <code>manifest.json</code>, <code>sw.js</code> ve <code>.nojekyll</code> dosyalarını yükleyin.</li>
-          <li>Repository ayarlarından (Settings -> Pages) <b>main / root</b> dalını seçip kaydedin.</li>
-        </ol>
+        <button id="downloadManifestBtn" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 border border-slate-300 cursor-pointer">manifest.json İndir</button>
+        <button id="downloadSwBtn" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 border border-slate-300 cursor-pointer">sw.js İndir</button>
+        <button id="downloadNoJekyllBtn" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 border border-slate-300 cursor-pointer">.nojekyll İndir</button>
       </div>
     </div>
   </div>

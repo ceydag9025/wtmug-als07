@@ -32,11 +32,15 @@ function bindEvents() {
   document.getElementById('cantSeeBtn').addEventListener('click', () => submitNumberAnswer(true));
   document.getElementById('restartBtn').addEventListener('click', startTest);
 
-  document.getElementById('numberInput').addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') submitNumberAnswer();
+  // Mobil klavyedeki "Enter / Git" tuşu desteği
+  const numberInput = document.getElementById('numberInput');
+  numberInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      submitNumberAnswer();
+    }
   });
 
-  // Hem mouse click hem de mobil dokunma (pointerdown / click) desteği
   const svgEl = document.getElementById('ishiharaSvg');
   svgEl.addEventListener('pointerdown', handleSvgInteraction);
 
@@ -57,7 +61,7 @@ function generateTestPlan() {
   const paletteKeys = ['RED_GREEN', 'RED_GREEN', 'BLUE_YELLOW', 'BLUE_YELLOW', 'TOTAL'];
   
   for (let i = 0; i < 5; i++) {
-    const randomNum = Math.floor(Math.random() * 99) + 1;
+    const randomNum = Math.floor(Math.random() * 89) + 10; // 10 ile 99 arası net okunan iki basamaklı sayılar
     const paletteKey = paletteKeys[i % paletteKeys.length];
     plan.push({ type: 'NUMBER', targetValue: randomNum, paletteKey, palette: COLOR_PALETTES[paletteKey] });
   }
@@ -106,7 +110,7 @@ function renderStep() {
     tapArea.classList.add('hidden');
     numberInput.value = '';
     numberInput.focus();
-    instructionText.innerText = 'Görseldeki gizli sayıyı (1-99) yazın:';
+    instructionText.innerText = 'Görseldeki gizli iki basamaklı sayıyı yazın:';
   } else {
     numberArea.classList.add('hidden');
     tapArea.classList.remove('hidden');
@@ -114,27 +118,28 @@ function renderStep() {
   }
 }
 
+// Telefonda net okuma sağlayan optimize edilmiş Ishihara nokta yerleşimi
 function renderIshiharaPlate(question) {
   const svg = document.getElementById('ishiharaSvg');
   svg.innerHTML = '';
   targetShapeCircles = [];
 
   const center = { x: 200, y: 200 };
-  const radius = 180;
+  const radius = 175;
   const dots = [];
-  const maxDots = 600;
+  const maxDots = 500; // Mobilde üst üste binmeyi ve karmaşayı önlemek için optimize edildi
   let attempts = 0;
 
   const baseBg = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
   baseBg.setAttribute('cx', '200');
   baseBg.setAttribute('cy', '200');
   baseBg.setAttribute('r', '190');
-  baseBg.setAttribute('fill', '#f8fafc');
+  baseBg.setAttribute('fill', '#ffffff');
   svg.appendChild(baseBg);
 
-  while (dots.length < maxDots && attempts < 3000) {
+  while (dots.length < maxDots && attempts < 2500) {
     attempts++;
-    const r = Math.random() * (10 - 4) + 4;
+    const r = Math.random() * (12 - 5) + 5; // Daha belirgin nokta boyutları
     const angle = Math.random() * Math.PI * 2;
     const dist = Math.sqrt(Math.random()) * (radius - r);
     
@@ -145,7 +150,7 @@ function renderIshiharaPlate(question) {
     for (const d of dots) {
       const dx = x - d.x;
       const dy = y - d.y;
-      if (Math.sqrt(dx * dx + dy * dy) < (r + d.r + 2)) {
+      if (Math.sqrt(dx * dx + dy * dy) < (r + d.r + 2.5)) {
         collision = true;
         break;
       }
@@ -185,6 +190,7 @@ function isPointInPattern(x, y, question) {
   }
 }
 
+// Telefonda net okuma için kalınlaştırılmış yazı maskesi
 function isPointInNumber(x, y, number) {
   const canvas = document.createElement('canvas');
   canvas.width = 400;
@@ -192,7 +198,7 @@ function isPointInNumber(x, y, number) {
   const ctx = canvas.getContext('2d');
 
   ctx.fillStyle = '#000000';
-  ctx.font = 'bold 170px sans-serif';
+  ctx.font = 'bold 150px sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText(number.toString(), 200, 205);
@@ -243,7 +249,7 @@ function handleSvgInteraction(e) {
   for (const circle of targetShapeCircles) {
     const dx = tapX - circle.x;
     const dy = tapY - circle.y;
-    if (Math.sqrt(dx * dx + dy * dy) <= circle.r + 20) {
+    if (Math.sqrt(dx * dx + dy * dy) <= circle.r + 25) {
       hit = true;
       break;
     }
@@ -340,7 +346,7 @@ function finishTest() {
   userAnswers.forEach(ans => {
     const item = document.createElement('div');
     item.className = `p-2 rounded-lg border flex justify-between items-center text-xs ${ans.isCorrect ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-rose-50 border-rose-200 text-rose-900'}`;
-    item.innerHTML = `<span><b>Aşama ${ans.step}:</b> ${ans.type === 'NUMBER' ? 'Sayı' : 'Şekil'}</span><span class="font-bold">${ans.isCorrect ? '✓' : '✕'}</span>`;
+    item.innerHTML = `<span><b>Aşama ${ans.step}:</b> ${ans.type === 'NUMBER' ? 'Sayı ('+ans.targetVal+')' : 'Şekil'}</span><span class="font-bold">${ans.isCorrect ? '✓ Doğru' : '✕ Yanlış'}</span>`;
     breakdownList.appendChild(item);
   });
 }
